@@ -21,7 +21,7 @@ interface Particle {
   char?: string;
 }
 
-const GLYPHS = ['0', '1', '◈', '◇', '▲', '⚡', '⬡', '⬢', '⨁', '⊛', 'ZNT', '2026'];
+const GLYPHS = ['0', '1', '◈', '◇', '▲', '⚡', '⬡', '⬢', '⨁', '⊛', '⌘', '✦'];
 
 export const FuturisticParticles: React.FC<FuturisticParticlesProps> = ({ status }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);

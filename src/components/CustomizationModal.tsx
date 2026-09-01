@@ -274,7 +274,7 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({
                       type="text"
                       value={config.topTitle}
                       onChange={(e) => updateField('topTitle', e.target.value)}
-                      placeholder="Contoh: BIMTEK ZNT 2026 DIMULAI"
+                      placeholder="insert your text"
                       className="w-full px-3.5 py-2.5 rounded-lg border border-cyan-500/40 bg-black/70 text-amber-300 font-['Orbitron'] font-bold text-base focus:outline-none focus:border-amber-400 shadow-[inset_0_0_10px_rgba(0,0,0,0.8)]"
                     />
 
@@ -284,7 +284,7 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({
                         type="text"
                         value={config.topBadge}
                         onChange={(e) => updateField('topBadge', e.target.value)}
-                        placeholder="AKSES RESMI DIBUKA"
+                        placeholder="insert your text"
                         className="flex-1 px-3 py-1.5 rounded-lg border border-cyan-500/30 bg-black/50 text-xs text-amber-200 font-mono focus:outline-none focus:border-amber-400"
                       />
                     </div>
@@ -322,7 +322,7 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({
                           type="text"
                           value={config.bottomIdleText}
                           onChange={(e) => updateField('bottomIdleText', e.target.value)}
-                          placeholder="tempelkan tangan"
+                          placeholder="insert your text"
                           className="w-full px-3 py-2 rounded-lg border border-cyan-500/30 bg-black/60 text-cyan-300 font-['Orbitron'] text-sm focus:outline-none focus:border-cyan-400"
                         />
                       </div>
@@ -332,7 +332,7 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({
                           type="text"
                           value={config.bottomScanningText}
                           onChange={(e) => updateField('bottomScanningText', e.target.value)}
-                          placeholder="memindai..."
+                          placeholder="insert your text"
                           className="w-full px-3 py-2 rounded-lg border border-cyan-500/30 bg-black/60 text-sky-300 font-['Orbitron'] text-sm focus:outline-none focus:border-cyan-400"
                         />
                       </div>
@@ -344,7 +344,7 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({
                         type="text"
                         value={config.stopButtonText}
                         onChange={(e) => updateField('stopButtonText', e.target.value)}
-                        placeholder="matikan sirine"
+                        placeholder="insert your text"
                         className="w-full px-3 py-2 rounded-lg border border-rose-500/30 bg-black/60 text-rose-300 font-['Orbitron'] text-sm focus:outline-none focus:border-rose-400"
                       />
                     </div>

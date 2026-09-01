@@ -13,7 +13,7 @@ import { ScanStatus, AppCustomConfig, DEFAULT_CONFIG } from './types';
 import { soundEngine } from './utils/audio';
 import { Volume2, VolumeX, RotateCcw, Sparkles, CheckCircle2, SlidersHorizontal } from 'lucide-react';
 
-const STORAGE_KEY = 'biometric_scanner_config_v1';
+const STORAGE_KEY = 'biometric_scanner_config_v2';
 
 export default function App() {
   const [status, setStatus] = useState<ScanStatus>('idle');
@@ -345,7 +345,7 @@ export default function App() {
                 transition={{ repeat: Infinity, duration: 1.2, ease: 'easeInOut' }}
                 className="font-['Orbitron'] font-black text-amber-200 tracking-[0.12em] sm:tracking-[0.18em] uppercase leading-tight"
               >
-                {config.topTitle || 'BIMTEK ZNT 2026 DIMULAI'}
+                {config.topTitle || 'INSERT YOUR TEXT'}
               </motion.h1>
             </div>
           </motion.div>
@@ -380,8 +380,8 @@ export default function App() {
                   className="font-['Orbitron'] font-extrabold text-cyan-300 tracking-[0.25em] uppercase drop-shadow-[0_0_12px_rgba(0,229,255,0.9)]"
                 >
                   {status === 'scanning'
-                    ? config.bottomScanningText || 'memindai...'
-                    : config.bottomIdleText || 'tempelkan tangan'}
+                    ? config.bottomScanningText || 'insert your text'
+                    : config.bottomIdleText || 'insert your text'}
                 </span>
               </motion.div>
 
@@ -416,7 +416,7 @@ export default function App() {
               >
                 <RotateCcw className="w-5 h-5 text-rose-300 animate-spin" style={{ animationDuration: '4s' }} />
                 <span>
-                  {config.stopButtonText || 'matikan sirine'} ({countdown}s)
+                  {config.stopButtonText || 'insert your text'} ({countdown}s)
                 </span>
               </button>
             </motion.div>
