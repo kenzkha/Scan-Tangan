@@ -1,0 +1,6 @@
+{
+  "name": "Biometric Hand Scanner Hologram",
+  "description": "Pemindai biometrik telapak tangan hologram futuristik dengan efek partikel konstelasi sci-fi, pemindaian sekali sentuh, sirine alarm, dan peresmian BIMTEK ZNT 2026 DIMULAI.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
