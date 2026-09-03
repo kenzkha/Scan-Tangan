@@ -45,17 +45,19 @@ export const HologramHand: React.FC<HologramHandProps> = ({
   const handsArray = Array.from({ length: Math.min(5, Math.max(1, handCount)) }, (_, i) => i);
 
   // Responsive max height and spacing depending on how many hands are present
-  const getHandMaxHeightClass = () => {
-    if (handCount === 1) return 'max-h-[60vh] sm:max-h-[70vh]';
-    if (handCount === 2) return 'max-h-[50vh] sm:max-h-[62vh]';
-    if (handCount === 3) return 'max-h-[42vh] sm:max-h-[54vh]';
-    return 'max-h-[35vh] sm:max-h-[46vh]';
+  const getHandHeightClass = () => {
+    if (handCount === 1) return 'h-[60vh] sm:h-[70vh]';
+    if (handCount === 2) return 'h-[50vh] sm:h-[62vh]';
+    if (handCount === 3) return 'h-[42vh] sm:h-[54vh]';
+    return 'h-[35vh] sm:h-[46vh]';
   };
 
   const renderScannerGraphic = (index: number) => {
+    const heightClass = getHandHeightClass();
+    
     if (scannerType === 'fingerprint') {
       return (
-        <div className={`relative flex items-center justify-center text-cyan-400 ${getHandMaxHeightClass()} aspect-square`}>
+        <div className={`relative flex items-center justify-center text-cyan-400 ${heightClass} aspect-square`}>
           <Fingerprint className="w-full h-full opacity-80" strokeWidth={1} />
         </div>
       );
@@ -63,7 +65,7 @@ export const HologramHand: React.FC<HologramHandProps> = ({
     
     if (scannerType === 'button') {
       return (
-        <div className={`relative flex items-center justify-center ${getHandMaxHeightClass()} aspect-square`}>
+        <div className={`relative flex items-center justify-center ${heightClass} aspect-square`}>
           <div className="absolute inset-0 rounded-full border-4 border-dashed border-cyan-400/40 animate-[spin_10s_linear_infinite]" />
           <div className="absolute inset-4 rounded-full border-2 border-cyan-300/60 animate-[spin_6s_linear_infinite_reverse]" />
           <Target className="w-1/2 h-1/2 text-cyan-200 opacity-90" strokeWidth={1.5} />
@@ -78,7 +80,7 @@ export const HologramHand: React.FC<HologramHandProps> = ({
         src="/assets/hologram-hand-cutout.png"
         alt={`Biometric Holographic Hand ${index + 1}`}
         referrerPolicy="no-referrer"
-        className={`${getHandMaxHeightClass()} w-auto max-w-[85vw] object-contain select-none pointer-events-none`}
+        className={`${heightClass} w-auto max-w-[85vw] object-contain select-none pointer-events-none`}
       />
     );
   };
