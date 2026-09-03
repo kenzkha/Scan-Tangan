@@ -1,4 +1,4 @@
-export type ScanStatus = 'idle' | 'scanning' | 'activated';
+export type ScanStatus = 'idle' | 'pressing' | 'scanning' | 'activated';
 
 export type SirenSoundType = 
   | 'school_alarm' 

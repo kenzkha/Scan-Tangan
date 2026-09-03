@@ -57,9 +57,10 @@ export default function App() {
 
   const scanIntervalRef = useRef<number | null>(null);
   const countdownIntervalRef = useRef<number | null>(null);
+  const holdTimeoutRef = useRef<number | null>(null);
 
   // Trigger scan on touch / tap / click
-  const handleTriggerScan = useCallback(() => {
+  const handlePointerDown = useCallback((e?: React.PointerEvent) => {
     if (isSettingsOpen) return;
 
     if (status === 'activated') {
@@ -76,12 +77,27 @@ export default function App() {
     }
 
     if (status === 'idle') {
-      // Start scanning sequence immediately upon brief touch/tap
-      setStatus('scanning');
-      setScanProgress(0);
-      soundEngine.startScanHum();
+      // Start pressing sequence
+      setStatus('pressing');
+      soundEngine.playScanTick(0.2);
+      
+      holdTimeoutRef.current = window.setTimeout(() => {
+        setStatus('scanning');
+        setScanProgress(0);
+        soundEngine.startScanHum();
+      }, 1500); // 1.5 seconds hold duration
     }
   }, [status, isSettingsOpen]);
+
+  const handlePointerUp = useCallback(() => {
+    if (status === 'pressing') {
+      if (holdTimeoutRef.current) {
+        clearTimeout(holdTimeoutRef.current);
+        holdTimeoutRef.current = null;
+      }
+      setStatus('idle');
+    }
+  }, [status]);
 
   // Automated scanning progression based on config.scanDuration
   useEffect(() => {
@@ -246,7 +262,10 @@ export default function App() {
   return (
     <main
       id="main-screen-scanner"
-      onClick={handleTriggerScan}
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
+      onPointerLeave={handlePointerUp}
+      onContextMenu={(e) => e.preventDefault()}
       className={`relative w-screen h-screen overflow-hidden bg-black text-slate-100 flex flex-col items-center justify-center select-none cursor-pointer transition-colors duration-700 ${
         status === 'activated' ? 'bg-[#0a0208]' : 'bg-[#010811]'
       }`}
@@ -320,7 +339,6 @@ export default function App() {
           handCount={config.handCount}
           handSpacing={config.handSpacing}
           scannerType={config.scannerType}
-          onHandTap={handleTriggerScan}
         />
       </div>
 
@@ -403,22 +421,42 @@ export default function App() {
                 animate={
                   status === 'idle'
                     ? { opacity: [0.8, 1, 0.8], scale: [0.98, 1.02, 0.98] }
-                    : { opacity: 1, scale: 1.05 }
+                    : status === 'pressing'
+                      ? { opacity: [1, 0.7, 1], scale: [1, 1.05, 1], filter: ['drop-shadow(0 0 15px rgba(0,229,255,0.8))', 'drop-shadow(0 0 35px rgba(251,191,36,0.8))', 'drop-shadow(0 0 15px rgba(0,229,255,0.8))'] }
+                      : { opacity: 1, scale: 1.05 }
                 }
-                transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
+                transition={
+                  status === 'pressing' 
+                    ? { repeat: Infinity, duration: 0.5, ease: "easeInOut" } 
+                    : { repeat: Infinity, duration: 1.8, ease: "easeInOut" }
+                }
                 className="px-6 py-2.5 sm:px-8 sm:py-3 rounded-full border-2 border-cyan-400/80 bg-black/80 backdrop-blur-xl shadow-[0_0_35px_rgba(0,229,255,0.5),inset_0_0_20px_rgba(0,229,255,0.2)] cursor-pointer"
               >
                 <span
                   style={{
                     fontSize: `clamp(1.0rem, ${1.25 * config.bottomTextScale}vw + 0.5rem, ${2.2 * config.bottomTextScale}rem)`,
                   }}
-                  className="font-['Orbitron'] font-extrabold text-cyan-300 tracking-[0.25em] uppercase drop-shadow-[0_0_12px_rgba(0,229,255,0.9)]"
+                  className={`font-['Orbitron'] font-extrabold tracking-[0.25em] uppercase transition-colors duration-300 ${status === 'pressing' ? 'text-amber-300 drop-shadow-[0_0_12px_rgba(251,191,36,0.9)]' : 'text-cyan-300 drop-shadow-[0_0_12px_rgba(0,229,255,0.9)]'}`}
                 >
                   {status === 'scanning'
                     ? config.bottomScanningText || 'insert your text'
-                    : config.bottomIdleText || 'insert your text'}
+                    : status === 'pressing'
+                      ? 'MEMINDAI...' // Give visual feedback it's working
+                      : config.bottomIdleText || 'insert your text'}
                 </span>
               </motion.div>
+
+              {/* Progress bar during hold (pressing) */}
+              {status === 'pressing' && (
+                <div className="w-48 sm:w-64 h-2 bg-slate-900/90 rounded-full border border-amber-500/40 overflow-hidden shadow-[0_0_15px_rgba(251,191,36,0.4)]">
+                  <motion.div
+                    initial={{ width: '0%' }}
+                    animate={{ width: '100%' }}
+                    transition={{ duration: 1.5, ease: 'linear' }}
+                    className="h-full bg-gradient-to-r from-amber-500 via-orange-300 to-yellow-500"
+                  />
+                </div>
+              )}
 
               {/* Progress bar during scan */}
               {status === 'scanning' && (
