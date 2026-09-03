@@ -22,7 +22,6 @@ export const HologramHand: React.FC<HologramHandProps> = ({
 }) => {
   const isScanning = status === 'scanning';
   const isActivated = status === 'activated';
-  const isPressing = status === 'pressing';
 
   // Ambient floating holographic particles around the hand
   const particles = [
@@ -153,20 +152,14 @@ export const HologramHand: React.FC<HologramHandProps> = ({
                         'brightness(1.1) drop-shadow(0 0 30px rgba(244,63,94,0.85)) hue-rotate(140deg)',
                       ],
                     }
-                  : isPressing
-                  ? {
-                      scale: [handScale * 0.95, handScale * 0.98, handScale * 0.95],
-                      filter: [
-                        'brightness(1.15) drop-shadow(0 0 35px rgba(251,191,36,0.8)) hue-rotate(-20deg)',
-                        'brightness(1.4) drop-shadow(0 0 60px rgba(251,191,36,1)) hue-rotate(-20deg)',
-                        'brightness(1.15) drop-shadow(0 0 35px rgba(251,191,36,0.8)) hue-rotate(-20deg)',
-                      ],
-                    }
                   : isScanning
                   ? {
-                      scale: handScale * 1.04,
-                      filter:
-                        'brightness(1.3) drop-shadow(0 0 35px rgba(0,229,255,0.9)) drop-shadow(0 0 70px rgba(0,180,255,0.6))',
+                      scale: [handScale * 0.98, handScale * 1.02, handScale * 0.98],
+                      filter: [
+                        'brightness(1.1) drop-shadow(0 0 35px rgba(0,229,255,0.7)) drop-shadow(0 0 70px rgba(0,180,255,0.4))',
+                        'brightness(1.35) drop-shadow(0 0 45px rgba(0,229,255,0.95)) drop-shadow(0 0 80px rgba(0,180,255,0.7))',
+                        'brightness(1.1) drop-shadow(0 0 35px rgba(0,229,255,0.7)) drop-shadow(0 0 70px rgba(0,180,255,0.4))',
+                      ],
                     }
                   : {
                       scale: [handScale * 0.985, handScale * 1.015, handScale * 0.985],
@@ -175,8 +168,8 @@ export const HologramHand: React.FC<HologramHandProps> = ({
                     }
               }
               transition={{
-                repeat: (isActivated || isPressing) ? Infinity : isScanning ? 0 : Infinity,
-                duration: isActivated ? 0.45 : isPressing ? 0.25 : isScanning ? 0.2 : 3.0 + index * 0.3,
+                repeat: (isActivated || isScanning) ? Infinity : Infinity,
+                duration: isActivated ? 0.45 : isScanning ? 0.4 : 3.0 + index * 0.3,
                 ease: 'easeInOut',
               }}
               className="relative flex flex-col items-center justify-center cursor-pointer pointer-events-auto transition-transform duration-300"

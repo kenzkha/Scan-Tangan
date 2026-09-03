@@ -57,10 +57,12 @@ export default function App() {
 
   const scanIntervalRef = useRef<number | null>(null);
   const countdownIntervalRef = useRef<number | null>(null);
-  const holdTimeoutRef = useRef<number | null>(null);
+  const activePointers = useRef<Set<number>>(new Set());
 
   // Trigger scan on touch / tap / click
-  const handlePointerDown = useCallback((e?: React.PointerEvent) => {
+  const handlePointerDown = useCallback((e: React.PointerEvent) => {
+    activePointers.current.add(e.pointerId);
+
     if (isSettingsOpen) return;
 
     if (status === 'activated') {
@@ -77,25 +79,29 @@ export default function App() {
     }
 
     if (status === 'idle') {
-      // Start pressing sequence
-      setStatus('pressing');
-      soundEngine.playScanTick(0.2);
-      
-      holdTimeoutRef.current = window.setTimeout(() => {
+      // Start scanning sequence ONLY on the first touch point
+      if (activePointers.current.size === 1) {
         setStatus('scanning');
         setScanProgress(0);
         soundEngine.startScanHum();
-      }, 1500); // 1.5 seconds hold duration
+      }
     }
   }, [status, isSettingsOpen]);
 
-  const handlePointerUp = useCallback(() => {
-    if (status === 'pressing') {
-      if (holdTimeoutRef.current) {
-        clearTimeout(holdTimeoutRef.current);
-        holdTimeoutRef.current = null;
+  const handlePointerUp = useCallback((e: React.PointerEvent) => {
+    activePointers.current.delete(e.pointerId);
+
+    if (status === 'scanning') {
+      // Only cancel if ALL touch points (the whole hand) have been lifted
+      if (activePointers.current.size === 0) {
+        if (scanIntervalRef.current) {
+          clearInterval(scanIntervalRef.current);
+          scanIntervalRef.current = null;
+        }
+        soundEngine.stopScanHum();
+        setStatus('idle');
+        setScanProgress(0);
       }
-      setStatus('idle');
     }
   }, [status]);
 
@@ -265,8 +271,9 @@ export default function App() {
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
       onPointerLeave={handlePointerUp}
+      onPointerCancel={handlePointerUp}
       onContextMenu={(e) => e.preventDefault()}
-      className={`relative w-screen h-screen overflow-hidden bg-black text-slate-100 flex flex-col items-center justify-center select-none cursor-pointer transition-colors duration-700 ${
+      className={`relative w-screen h-screen overflow-hidden bg-black text-slate-100 flex flex-col items-center justify-center select-none touch-none cursor-pointer transition-colors duration-700 ${
         status === 'activated' ? 'bg-[#0a0208]' : 'bg-[#010811]'
       }`}
     >
@@ -436,35 +443,26 @@ export default function App() {
                   style={{
                     fontSize: `clamp(1.0rem, ${1.25 * config.bottomTextScale}vw + 0.5rem, ${2.2 * config.bottomTextScale}rem)`,
                   }}
-                  className={`font-['Orbitron'] font-extrabold tracking-[0.25em] uppercase transition-colors duration-300 ${status === 'pressing' ? 'text-amber-300 drop-shadow-[0_0_12px_rgba(251,191,36,0.9)]' : 'text-cyan-300 drop-shadow-[0_0_12px_rgba(0,229,255,0.9)]'}`}
+                  className={`font-['Orbitron'] font-extrabold tracking-[0.25em] uppercase transition-colors duration-300 text-cyan-300 drop-shadow-[0_0_12px_rgba(0,229,255,0.9)]`}
                 >
                   {status === 'scanning'
-                    ? config.bottomScanningText || 'insert your text'
-                    : status === 'pressing'
-                      ? 'MEMINDAI...' // Give visual feedback it's working
-                      : config.bottomIdleText || 'insert your text'}
+                    ? config.bottomScanningText || 'MEMINDAI...'
+                    : config.bottomIdleText || 'insert your text'}
                 </span>
               </motion.div>
 
-              {/* Progress bar during hold (pressing) */}
-              {status === 'pressing' && (
-                <div className="w-48 sm:w-64 h-2 bg-slate-900/90 rounded-full border border-amber-500/40 overflow-hidden shadow-[0_0_15px_rgba(251,191,36,0.4)]">
-                  <motion.div
-                    initial={{ width: '0%' }}
-                    animate={{ width: '100%' }}
-                    transition={{ duration: 1.5, ease: 'linear' }}
-                    className="h-full bg-gradient-to-r from-amber-500 via-orange-300 to-yellow-500"
-                  />
-                </div>
-              )}
-
-              {/* Progress bar during scan */}
+              {/* Progress bar and Percentage during scan */}
               {status === 'scanning' && (
-                <div className="w-48 sm:w-64 h-2 bg-slate-900/90 rounded-full border border-cyan-500/40 overflow-hidden shadow-[0_0_15px_rgba(0,229,255,0.4)]">
-                  <div
-                    className="h-full bg-gradient-to-r from-cyan-500 via-sky-300 to-blue-500 transition-all duration-75"
-                    style={{ width: `${scanProgress}%` }}
-                  />
+                <div className="flex flex-col items-center gap-2">
+                  <div className="w-48 sm:w-64 h-2 bg-slate-900/90 rounded-full border border-cyan-500/40 overflow-hidden shadow-[0_0_15px_rgba(0,229,255,0.4)]">
+                    <div
+                      className="h-full bg-gradient-to-r from-cyan-500 via-sky-300 to-blue-500 transition-all duration-75"
+                      style={{ width: `${scanProgress}%` }}
+                    />
+                  </div>
+                  <div className="font-['Orbitron'] font-bold text-cyan-400 tracking-wider text-sm sm:text-base animate-pulse">
+                    {Math.floor(scanProgress)}%
+                  </div>
                 </div>
               )}
             </motion.div>
