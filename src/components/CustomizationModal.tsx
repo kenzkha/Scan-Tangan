@@ -192,12 +192,42 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({
               {/* TAB 1: TANGAN & JUMLAH TANGAN */}
               {activeTab === 'display' && (
                 <div className="space-y-6">
+                  {/* Pilihan Grafis Scanner */}
+                  <div className="p-4 rounded-xl border border-cyan-500/25 bg-black/30 space-y-3">
+                    <label className="font-['Orbitron'] font-semibold text-cyan-300 block">
+                      Bentuk Grafis Pemindai (Scanner Type)
+                    </label>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      {[
+                        { id: 'hand', label: 'Telapak Tangan', desc: 'Pemindai biometrik tangan' },
+                        { id: 'fingerprint', label: 'Sidik Jari', desc: 'Pemindai biometrik sidik jari' },
+                        { id: 'button', label: 'Tombol Futuristik', desc: 'Tombol siber bundar' },
+                      ].map((item) => (
+                        <button
+                          key={item.id}
+                          onClick={() => updateField('scannerType', item.id as any)}
+                          className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                            config.scannerType === item.id
+                              ? 'border-cyan-400 bg-cyan-950/80 text-cyan-200 shadow-[0_0_15px_rgba(0,229,255,0.3)]'
+                              : 'border-slate-800 bg-slate-900/60 text-slate-400 hover:border-slate-700'
+                          }`}
+                        >
+                          <div className="font-semibold text-xs sm:text-sm text-cyan-300 flex items-center justify-between">
+                            <span>{item.label}</span>
+                            {config.scannerType === item.id && <Check className="w-4 h-4 text-cyan-400" />}
+                          </div>
+                          <div className="text-[11px] text-slate-400 mt-1">{item.desc}</div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
                   {/* Jumlah Tangan (1 - 5) */}
                   <div className="p-4 rounded-xl border border-cyan-500/25 bg-black/30 space-y-3">
                     <div className="flex items-center justify-between">
                       <label className="font-['Orbitron'] font-semibold text-cyan-300 flex items-center gap-2">
                         <Users className="w-4 h-4 text-cyan-400" />
-                        Jumlah Tangan Pemindai: <span className="text-amber-300 font-bold">{config.handCount} Tangan</span>
+                        Jumlah Pemindai: <span className="text-amber-300 font-bold">{config.handCount}</span>
                       </label>
                       <span className="text-xs text-cyan-400/60">Untuk peresmian bersama / VIP</span>
                     </div>
@@ -220,12 +250,54 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({
                     </div>
                   </div>
 
+                  {/* Jarak Antar Pemindai */}
+                  {config.handCount > 1 && (
+                    <div className="p-4 rounded-xl border border-cyan-500/25 bg-black/30 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <label className="font-['Orbitron'] font-semibold text-cyan-300 flex items-center gap-2">
+                          <Sliders className="w-4 h-4 text-cyan-400" />
+                          Jarak Antar Pemindai: <span className="text-amber-300 font-bold">{config.handSpacing}rem</span>
+                        </label>
+                        <div className="flex gap-1.5">
+                          {[1.0, 2.0, 3.0, 4.0].map((s) => (
+                            <button
+                              key={s}
+                              onClick={() => updateField('handSpacing', s)}
+                              className={`px-2 py-1 text-[11px] rounded border ${
+                                config.handSpacing === s
+                                  ? 'border-cyan-400 bg-cyan-900/60 text-cyan-200'
+                                  : 'border-slate-800 bg-slate-900 text-slate-400 hover:text-cyan-300'
+                              }`}
+                            >
+                              {s}r
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <input
+                        type="range"
+                        min="0"
+                        max="8"
+                        step="0.5"
+                        value={config.handSpacing}
+                        onChange={(e) => updateField('handSpacing', parseFloat(e.target.value))}
+                        className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-400"
+                      />
+                      <div className="flex justify-between text-[11px] text-slate-500">
+                        <span>Rapat (0)</span>
+                        <span>Standar (2)</span>
+                        <span>Lebar (8)</span>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Skala Ukuran Tangan */}
                   <div className="p-4 rounded-xl border border-cyan-500/25 bg-black/30 space-y-3">
                     <div className="flex items-center justify-between">
                       <label className="font-['Orbitron'] font-semibold text-cyan-300 flex items-center gap-2">
                         <Maximize2 className="w-4 h-4 text-cyan-400" />
-                        Ukuran Tangan: <span className="text-amber-300 font-bold">{Math.round(config.handScale * 100)}%</span>
+                        Ukuran Pemindai: <span className="text-amber-300 font-bold">{Math.round(config.handScale * 100)}%</span>
                       </label>
                       <div className="flex gap-1.5">
                         {[0.7, 1.0, 1.25, 1.5, 1.8].map((s) => (

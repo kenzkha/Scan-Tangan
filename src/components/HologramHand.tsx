@@ -1,12 +1,15 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { ScanStatus } from '../types';
+import { ScanStatus, ScannerGraphicType } from '../types';
+import { Fingerprint, Target } from 'lucide-react';
 
 interface HologramHandProps {
   status: ScanStatus;
   scanProgress: number; // 0 to 100
   handScale?: number;
   handCount?: number;
+  handSpacing?: number;
+  scannerType?: ScannerGraphicType;
   onHandTap?: () => void;
 }
 
@@ -15,6 +18,8 @@ export const HologramHand: React.FC<HologramHandProps> = ({
   scanProgress,
   handScale = 1.0,
   handCount = 1,
+  handSpacing = 2.0,
+  scannerType = 'hand',
   onHandTap,
 }) => {
   const isScanning = status === 'scanning';
@@ -45,6 +50,37 @@ export const HologramHand: React.FC<HologramHandProps> = ({
     if (handCount === 2) return 'max-h-[50vh] sm:max-h-[62vh]';
     if (handCount === 3) return 'max-h-[42vh] sm:max-h-[54vh]';
     return 'max-h-[35vh] sm:max-h-[46vh]';
+  };
+
+  const renderScannerGraphic = (index: number) => {
+    if (scannerType === 'fingerprint') {
+      return (
+        <div className={`relative flex items-center justify-center text-cyan-400 ${getHandMaxHeightClass()} aspect-square`}>
+          <Fingerprint className="w-full h-full opacity-80" strokeWidth={1} />
+        </div>
+      );
+    }
+    
+    if (scannerType === 'button') {
+      return (
+        <div className={`relative flex items-center justify-center ${getHandMaxHeightClass()} aspect-square`}>
+          <div className="absolute inset-0 rounded-full border-4 border-dashed border-cyan-400/40 animate-[spin_10s_linear_infinite]" />
+          <div className="absolute inset-4 rounded-full border-2 border-cyan-300/60 animate-[spin_6s_linear_infinite_reverse]" />
+          <Target className="w-1/2 h-1/2 text-cyan-200 opacity-90" strokeWidth={1.5} />
+          <div className="absolute inset-0 bg-cyan-400/10 rounded-full blur-md" />
+        </div>
+      );
+    }
+
+    // Default: Hand image
+    return (
+      <img
+        src="/assets/hologram-hand-cutout.png"
+        alt={`Biometric Holographic Hand ${index + 1}`}
+        referrerPolicy="no-referrer"
+        className={`${getHandMaxHeightClass()} w-auto max-w-[85vw] object-contain select-none pointer-events-none`}
+      />
+    );
   };
 
   return (
@@ -95,7 +131,10 @@ export const HologramHand: React.FC<HologramHandProps> = ({
       </div>
 
       {/* Hands Container - Horizontally aligned for multiple participants */}
-      <div className="relative z-10 w-full flex items-center justify-center flex-wrap gap-4 sm:gap-8 md:gap-12 px-2">
+      <div 
+        className="relative z-10 w-full flex items-center justify-center flex-wrap px-2"
+        style={{ gap: `${handSpacing}rem` }}
+      >
         {handsArray.map((index) => {
           return (
             <motion.div
@@ -133,14 +172,9 @@ export const HologramHand: React.FC<HologramHandProps> = ({
               }}
               className="relative flex flex-col items-center justify-center cursor-pointer pointer-events-auto transition-transform duration-300"
             >
-              {/* Individual Hand Hologram Image */}
+              {/* Individual Hand Hologram Image / Graphic */}
               <div className="relative flex items-center justify-center">
-                <img
-                  src="/assets/hologram-hand-cutout.png"
-                  alt={`Biometric Holographic Hand ${index + 1}`}
-                  referrerPolicy="no-referrer"
-                  className={`${getHandMaxHeightClass()} w-auto max-w-[85vw] object-contain select-none pointer-events-none`}
-                />
+                {renderScannerGraphic(index)}
 
                 {/* Laser scan line on this hand */}
                 {isScanning && (

@@ -11,7 +11,7 @@ import { FuturisticParticles } from './components/FuturisticParticles';
 import { CustomizationModal } from './components/CustomizationModal';
 import { ScanStatus, AppCustomConfig, DEFAULT_CONFIG } from './types';
 import { soundEngine } from './utils/audio';
-import { Volume2, VolumeX, RotateCcw, Sparkles, CheckCircle2, SlidersHorizontal } from 'lucide-react';
+import { Volume2, VolumeX, RotateCcw, Sparkles, CheckCircle2, SlidersHorizontal, Maximize, Minimize } from 'lucide-react';
 
 const STORAGE_KEY = 'biometric_scanner_config_v2';
 
@@ -21,6 +21,7 @@ export default function App() {
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [countdown, setCountdown] = useState<number>(10);
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
 
   // Configuration state with local persistence
   const [config, setConfig] = useState<AppCustomConfig>(() => {
@@ -185,6 +186,31 @@ export default function App() {
     setIsSettingsOpen(true);
   };
 
+  const handleToggleFullscreen = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      if (!document.fullscreenElement) {
+        await document.documentElement.requestFullscreen();
+        setIsFullscreen(true);
+      } else {
+        if (document.exitFullscreen) {
+          await document.exitFullscreen();
+          setIsFullscreen(false);
+        }
+      }
+    } catch (err) {
+      console.error("Error attempting to enable fullscreen:", err);
+    }
+  };
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
   // Render Background Style
   const renderBackgroundLayer = () => {
     if (config.bgType === 'custom' && config.customBgUrl) {
@@ -251,7 +277,7 @@ export default function App() {
       {/* Futuristic Particle Simulation System */}
       <FuturisticParticles status={status} />
 
-      {/* Top Left Menu: Customization Settings Button */}
+      {/* Top Left Menu: Customization Settings Button & Fullscreen */}
       <div className="absolute top-4 left-4 z-40 flex items-center gap-2">
         <button
           id="btn-open-settings"
@@ -263,6 +289,13 @@ export default function App() {
           <span className="hidden sm:inline font-['Orbitron'] font-bold text-xs tracking-wider uppercase">
             Pengaturan
           </span>
+        </button>
+        <button
+          onClick={handleToggleFullscreen}
+          className="p-2.5 rounded-full sm:rounded-xl border border-cyan-500/40 bg-black/70 backdrop-blur-md text-cyan-300 hover:text-white hover:border-cyan-400 hover:bg-cyan-950/80 transition-all shadow-[0_0_20px_rgba(0,229,255,0.25)] flex items-center cursor-pointer"
+          title={isFullscreen ? "Keluar Layar Penuh" : "Layar Penuh"}
+        >
+          {isFullscreen ? <Minimize className="w-4 h-4 text-cyan-400" /> : <Maximize className="w-4 h-4 text-cyan-400" />}
         </button>
       </div>
 
@@ -285,6 +318,8 @@ export default function App() {
           scanProgress={scanProgress}
           handScale={config.handScale}
           handCount={config.handCount}
+          handSpacing={config.handSpacing}
+          scannerType={config.scannerType}
           onHandTap={handleTriggerScan}
         />
       </div>
