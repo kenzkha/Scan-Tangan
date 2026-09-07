@@ -55,9 +55,27 @@ export default function App() {
     }
   };
 
+  const mainRef = useRef<HTMLElement>(null);
   const scanIntervalRef = useRef<number | null>(null);
   const countdownIntervalRef = useRef<number | null>(null);
   const activePointers = useRef<Set<number>>(new Set());
+
+  // Non-passive touchstart listener to eliminate tablet gesture interference and palm rejection
+  useEffect(() => {
+    const el = mainRef.current;
+    if (!el) return;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      // Prevent default ONLY when interacting with the main scanner (not settings)
+      // This stops tablet flickering, pinch-zoom, swipe-back, and palm rejection cancelations.
+      if (!isSettingsOpen) {
+        e.preventDefault();
+      }
+    };
+
+    el.addEventListener('touchstart', handleTouchStart, { passive: false });
+    return () => el.removeEventListener('touchstart', handleTouchStart);
+  }, [isSettingsOpen]);
 
   // Trigger scan on touch / tap / click
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
@@ -109,7 +127,7 @@ export default function App() {
   useEffect(() => {
     if (status === 'scanning') {
       const totalScanMs = Math.max(200, config.scanDuration * 1000);
-      const stepIntervalMs = 30;
+      const stepIntervalMs = 50; // Optimized interval to reduce react re-renders and fix tablet flicker
       const totalSteps = totalScanMs / stepIntervalMs;
       const stepIncrement = 100 / totalSteps;
 
@@ -267,13 +285,14 @@ export default function App() {
 
   return (
     <main
+      ref={mainRef as any}
       id="main-screen-scanner"
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
       onPointerLeave={handlePointerUp}
       onPointerCancel={handlePointerUp}
       onContextMenu={(e) => e.preventDefault()}
-      className={`relative w-screen h-screen overflow-hidden bg-black text-slate-100 flex flex-col items-center justify-center select-none touch-none cursor-pointer transition-colors duration-700 ${
+      className={`relative w-[100dvw] h-[100dvh] overflow-hidden bg-black text-slate-100 flex flex-col items-center justify-center select-none touch-none [-webkit-tap-highlight-color:transparent] cursor-pointer transition-colors duration-700 ${
         status === 'activated' ? 'bg-[#0a0208]' : 'bg-[#010811]'
       }`}
     >
@@ -456,7 +475,7 @@ export default function App() {
                 <div className="flex flex-col items-center gap-2">
                   <div className="w-48 sm:w-64 h-2 bg-slate-900/90 rounded-full border border-cyan-500/40 overflow-hidden shadow-[0_0_15px_rgba(0,229,255,0.4)]">
                     <div
-                      className="h-full bg-gradient-to-r from-cyan-500 via-sky-300 to-blue-500 transition-all duration-75"
+                      className="h-full bg-gradient-to-r from-cyan-500 via-sky-300 to-blue-500 transition-all duration-100"
                       style={{ width: `${scanProgress}%` }}
                     />
                   </div>

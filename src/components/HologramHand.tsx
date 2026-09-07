@@ -115,7 +115,7 @@ export const HologramHand: React.FC<HologramHandProps> = ({
               : { scale: [0.96, 1.04, 0.96], opacity: [0.25, 0.45, 0.25] }
           }
           transition={{ repeat: Infinity, duration: isActivated ? 0.55 : 2.4, ease: 'easeInOut' }}
-          className={`w-[500px] sm:w-[700px] h-[500px] sm:h-[700px] rounded-full blur-[100px] ${
+          className={`w-[500px] sm:w-[700px] h-[500px] sm:h-[700px] rounded-full blur-[100px] transform-gpu will-change-transform ${
             isActivated ? 'bg-rose-500/40' : 'bg-cyan-500/30'
           }`}
         />
@@ -191,7 +191,7 @@ export const HologramHand: React.FC<HologramHandProps> = ({
                 duration: isActivated ? 0.45 : isScanning ? 0.4 : 3.0 + index * 0.3,
                 ease: 'easeInOut',
               }}
-              className="relative flex flex-col items-center justify-center cursor-pointer pointer-events-auto transition-transform duration-300"
+              className="relative flex flex-col items-center justify-center cursor-pointer pointer-events-auto transition-transform duration-300 transform-gpu will-change-transform"
             >
               {/* Individual Hand Hologram Image / Graphic */}
               <div className="relative flex items-center justify-center">
@@ -203,7 +203,7 @@ export const HologramHand: React.FC<HologramHandProps> = ({
                     className="absolute inset-x-0 pointer-events-none"
                     style={{
                       top: `${Math.max(5, 95 - scanProgress)}%`,
-                      transition: 'top 40ms linear',
+                      transition: 'top 70ms linear',
                     }}
                   >
                     {/* Laser Core */}
