@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { ScanStatus, ScannerGraphicType } from '../types';
-import { Fingerprint, Target } from 'lucide-react';
+import { Fingerprint, Target, Power } from 'lucide-react';
 
 interface HologramHandProps {
   status: ScanStatus;
@@ -55,19 +55,38 @@ export const HologramHand: React.FC<HologramHandProps> = ({
     
     if (scannerType === 'fingerprint') {
       return (
-        <div className={`relative flex items-center justify-center text-cyan-400 ${heightClass} aspect-square`}>
-          <Fingerprint className="w-full h-full opacity-80" strokeWidth={1} />
+        <div className={`relative flex items-center justify-center text-cyan-400 ${heightClass} aspect-square p-8 sm:p-12`}>
+           <div className="absolute inset-0 rounded-3xl border border-cyan-500/30 bg-cyan-950/20 shadow-[inset_0_0_20px_rgba(0,229,255,0.1),0_0_15px_rgba(0,229,255,0.15)] flex items-center justify-center">
+             {/* Corner brackets for the frame */}
+             <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-cyan-400 rounded-tl-xl opacity-80" />
+             <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-cyan-400 rounded-tr-xl opacity-80" />
+             <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-cyan-400 rounded-bl-xl opacity-80" />
+             <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-cyan-400 rounded-br-xl opacity-80" />
+           </div>
+           <Fingerprint className="w-[65%] h-[65%] opacity-90 drop-shadow-[0_0_12px_rgba(0,229,255,0.6)]" strokeWidth={1.2} />
         </div>
       );
     }
     
     if (scannerType === 'button') {
+      const isPressed = isScanning || isActivated;
       return (
-        <div className={`relative flex items-center justify-center ${heightClass} aspect-square`}>
-          <div className="absolute inset-0 rounded-full border-4 border-dashed border-cyan-400/40 animate-[spin_10s_linear_infinite]" />
-          <div className="absolute inset-4 rounded-full border-2 border-cyan-300/60 animate-[spin_6s_linear_infinite_reverse]" />
-          <Target className="w-1/2 h-1/2 text-cyan-200 opacity-90" strokeWidth={1.5} />
-          <div className="absolute inset-0 bg-cyan-400/10 rounded-full blur-md" />
+        <div className={`relative flex items-center justify-center ${heightClass} aspect-square p-6`}>
+          {/* Outer Metallic Bezel */}
+          <div className="absolute inset-4 rounded-full bg-gradient-to-br from-slate-700 via-slate-800 to-black border border-slate-500/50 shadow-[0_15px_35px_rgba(0,0,0,0.9),inset_0_2px_4px_rgba(255,255,255,0.2)] flex items-center justify-center">
+             
+             {/* Button Inner Well */}
+             <div className="w-[88%] h-[88%] rounded-full bg-black/90 shadow-[inset_0_10px_20px_rgba(0,0,0,1)] flex items-center justify-center">
+               
+               {/* The Realistic Push Button */}
+               <div className={`w-[88%] h-[88%] rounded-full bg-gradient-to-b from-rose-600 to-red-800 flex items-center justify-center relative overflow-hidden transition-all duration-150 ${isPressed ? 'shadow-[inset_0_10px_25px_rgba(0,0,0,0.8),0_1px_2px_rgba(0,0,0,0.9)] scale-[0.96] translate-y-1' : 'shadow-[inset_0_8px_15px_rgba(255,255,255,0.35),inset_0_-15px_25px_rgba(0,0,0,0.5),0_10px_20px_rgba(0,0,0,0.7)]'}`}>
+                 {/* Gloss reflection */}
+                 <div className="absolute top-2 left-1/2 -translate-x-1/2 w-[55%] h-[25%] bg-gradient-to-b from-white/30 to-transparent rounded-full blur-[1px]" />
+                 {/* Power Icon */}
+                 <Power className={`w-1/2 h-1/2 transition-colors duration-300 ${isPressed ? 'text-white drop-shadow-[0_0_12px_rgba(255,255,255,0.9)]' : 'text-red-200/60 drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]'}`} strokeWidth={2.5} />
+               </div>
+             </div>
+          </div>
         </div>
       );
     }
