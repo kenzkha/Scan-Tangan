@@ -69,6 +69,10 @@ export default function App() {
       // Prevent default ONLY when interacting with the main scanner (not settings)
       // This stops tablet flickering, pinch-zoom, swipe-back, and palm rejection cancelations.
       if (!isSettingsOpen) {
+        // Do not prevent default if the user is touching a button (e.g. Settings, Fullscreen, Mute)
+        if ((e.target as HTMLElement).closest('button')) {
+          return;
+        }
         e.preventDefault();
       }
     };
